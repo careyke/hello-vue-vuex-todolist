@@ -3,8 +3,8 @@
     <span class="check" @click="handleCheckClick">
       <img :src="imgSrc" />
     </span>
-    <div></div>
-    <span class="delete">
+    <div class="text">{{ todo.text }}</div>
+    <span class="delete" @click="deleteTodo">
       <img class="icon" src="../assets/cha.png" />
     </span>
   </div>
@@ -17,27 +17,25 @@ import checkImg from "../assets/check.png";
 export default {
   name: "ListItem",
   props: {
-    id: {
+    todo: {
       required: true,
-      type: Number,
-    },
-    text: {
-      required: true,
-      type: String,
-    },
-    completed: {
-      type: Boolean,
-      default: false,
+      type: Object,
     },
   },
   computed: {
     imgSrc: function () {
-      return this.completed ? checkImg : uncheckImg;
+      return this.todo.completed ? checkImg : uncheckImg;
     },
   },
   methods: {
-    handleCheckClick: function () {
-      this.completed = !this.completed;
+    handleCheckClick() {
+      this.$store.commit("toggleTodo", {
+        ...this.todo,
+        completed: !this.todo.completed,
+      });
+    },
+    deleteTodo() {
+      this.$store.commit("deleteTodo", this.todo.id);
     },
   },
 };
@@ -50,6 +48,11 @@ export default {
   border-bottom: 1px solid #ededed;
   position: relative;
   align-items: center;
+  &:hover {
+    .delete {
+      display: flex;
+    }
+  }
 }
 .check {
   display: flex;
@@ -58,19 +61,16 @@ export default {
   margin-right: 15px;
   cursor: pointer;
 }
-.delete {
+.text {
   display: flex;
+  align-items: center;
+  flex-grow: 1;
+}
+.delete {
+  display: none;
   height: 40px;
   align-items: center;
   margin-left: 15px;
   cursor: pointer;
-  .icon {
-    display: none;
-  }
-  &:hover {
-    .icon {
-      display: block;
-    }
-  }
 }
 </style>
